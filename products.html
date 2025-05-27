@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Products - Isabelle Concepts & Prints</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Rubik', sans-serif;
+      background-color: #f9f9f9;
+      color: #222;
+      margin: 0;
+      padding: 0;
+    }
+
+    header, footer {
+      background-color: #1f1f1f;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+    }
+
+    nav a {
+      color: #fff;
+      margin: 0 15px;
+      text-decoration: none;
+    }
+
+    h1 {
+      text-align: center;
+      margin: 40px 0 20px;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 30px;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .product-card {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+      transition: box-shadow 0.3s ease;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .product-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .product-card img {
+      width: 100%;
+      height: auto;
+      margin-bottom: 15px;
+    }
+
+    .product-title {
+      font-weight: 600;
+      font-size: 16px;
+      margin: 5px 0;
+    }
+
+    .price {
+      color: #e60023;
+      font-weight: 600;
+      margin: 5px 0 15px;
+    }
+
+    .accordion-btn {
+      background-color: #f2f2f2;
+      border: none;
+      padding: 8px 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      text-align: left;
+      transition: background 0.3s ease;
+      margin-bottom: 5px;
+    }
+
+    .accordion-btn:hover {
+      background-color: #e2e2e2;
+    }
+
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, opacity 0.4s ease;
+      opacity: 0;
+      font-size: 14px;
+      color: #555;
+    }
+
+    .accordion-content.active {
+      max-height: 100px;
+      opacity: 1;
+      margin-top: 10px;
+    }
+
+    .order-btn {
+      margin-top: auto;
+      background-color: #222;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .order-btn:hover {
+      background-color: #444;
+    }
+
+    footer {
+      margin-top: 40px;
+    }
+
+    .modal {
+      display: block;
+      position: fixed;
+      z-index: 1000;
+      padding-top: 40px;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.7);
+    }
+    .modal-content.product-popup {
+      background-color: white;
+      margin: auto;
+      border-radius: 8px;
+      padding: 20px;
+      width: 90%;
+      max-width: 1000px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .close-btn {
+      position: absolute;
+      top: 15px; right: 20px;
+      font-size: 28px;
+      color: #aaa;
+      cursor: pointer;
+    }
+    .product-grid {
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+    .product-images {
+      flex: 1;
+    }
+    .product-images .main-img {
+      width: 100%;
+      border-radius: 8px;
+    }
+    .thumbnail-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .thumb {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border: 2px solid transparent;
+      cursor: pointer;
+    }
+    .thumb:hover {
+      border-color: #444;
+    }
+    .product-details {
+      flex: 1;
+    }
+    .price {
+      font-size: 20px;
+    }
+    .sale {
+      color: red;
+      font-weight: bold;
+    }
+    .original {
+      text-decoration: line-through;
+      color: gray;
+      margin-left: 10px;
+    }
+    .color-options {
+      display: flex;
+      gap: 10px;
+      margin: 5px 0 15px;
+    }
+    .color-swatch {
+      width: 25px; height: 25px;
+      border-radius: 50%;
+      border: 2px solid #ccc;
+      cursor: pointer;
+    }
+    .color-swatch.black { background: black; }
+    .color-swatch.white { background: white; border: 1px solid #aaa; }
+    .color-swatch.gray  { background: gray; }
+    .color-swatch.selected {
+      border: 2px solid #222;
+    }
+    .size-options button {
+      padding: 6px 12px;
+      margin-right: 5px;
+      border: 1px solid #ccc;
+      background: white;
+      cursor: pointer;
+    }
+    .quantity-controls {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 15px;
+    }
+    .quantity-controls button {
+      padding: 5px 10px;
+      font-size: 18px;
+      background: #eee;
+      border: none;
+      cursor: pointer;
+    }
+    .quantity-controls input {
+      width: 40px;
+      text-align: center;
+    }
+    textarea {
+      width: 100%;
+      height: 60px;
+      margin-bottom: 15px;
+    }
+    .add-to-cart, .buy-now {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: none;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+    .add-to-cart {
+      background-color: black;
+      color: white;
+    }
+    .buy-now {
+      background-color: white;
+      border: 1px solid black;
+    }
+    .product-specs {
+      list-style: none;
+      padding-left: 0;
+      font-size: 14px;
+      color: #555;
+    }
+    
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Isabelle Concepts & Prints</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="products.html">Products</a>
+      <a href="faqs.html">FAQ</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <h1>Our Products</h1>
+  <div class="product-grid">
+
+    <!-- Product 1 -->
+    <div class="product-card">
+      <img src="shirt.jpg" alt="Custom T-Shirt">
+      <div class="product-title">Custom T-Shirt</div>
+      <div class="price">₱450.00</div>
+      <button class="accordion-btn" onclick="toggleAccordion(this)">More Info</button>
+      <div class="accordion-content">
+        <p>High-quality cotton shirts with personalized designs available in various colors and sizes.</p>
+      </div>
+      <button class="order-btn">Order Now</button>
+    </div>
+
+    <!-- Product 2 -->
+    <div class="product-card">
+      <img src="mug.jpg" alt="Personalized Mug">
+      <div class="product-title">Personalized Mug</div>
+      <div class="price">₱200.00</div>
+      <button class="accordion-btn" onclick="toggleAccordion(this)">More Info</button>
+      <div class="accordion-content">
+        <p>Add your photo or design on our durable, dishwasher-safe mugs – perfect for gifts!</p>
+      </div>
+      <button class="order-btn">Order Now</button>
+    </div>
+
+    <!-- Product 3 -->
+    <div class="product-card">
+      <img src="tarpaulin.jpg" alt="Tarpaulin Printing">
+      <div class="product-title">Tarpaulin Printing</div>
+      <div class="price">₱150.00/sq.ft</div>
+      <button class="accordion-btn" onclick="toggleAccordion(this)">More Info</button>
+      <div class="accordion-content">
+        <p>High-resolution prints for events, promotions, or business signage in any size.</p>
+      </div>
+      <button class="order-btn">Order Now</button>
+    </div>
+
+    <!-- Product 4 -->
+    <div class="product-card">
+      <img src="invitation.jpg" alt="Custom Invitations">
+      <div class="product-title">Custom Invitations</div>
+      <div class="price">₱35.00 each</div>
+      <button class="accordion-btn" onclick="toggleAccordion(this)">More Info</button>
+      <div class="accordion-content">
+        <p>Beautifully designed invitations tailored for birthdays, weddings, and other events.</p>
+      </div>
+      <button class="order-btn">Order Now</button>
+    </div>
+
+  </div>
+
+  <footer>
+    <p>&copy; 2025 Isabelle Concepts & Prints. All rights reserved.</p>
+  </footer>
+
+  <script>
+    function toggleAccordion(button) {
+      const content = button.nextElementSibling;
+      content.classList.toggle('active');
+    }
+  </script>
+
+  <!-- Modal Structure -->
+<div id="product-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:999; justify-content:center; align-items:center;">
+  <div style="background:#fff; padding:30px; max-width:600px; width:90%; border-radius:10px; position:relative;">
+    <button onclick="closeModal()" style="position:absolute; top:10px; right:10px; background:none; border:none; font-size:18px; cursor:pointer;">&times;</button>
+    <img id="modal-img" src="" alt="" style="width:100%; border-radius:10px; margin-bottom:15px;">
+    <h2 id="modal-title"></h2>
+    <p id="modal-price" style="color:#e60023; font-weight:bold;"></p>
+    <p id="modal-description"></p>
+    <div style="margin-top:20px;">
+      <label for="size">Size:</label>
+      <select id="modal-size" style="margin-left:10px;">
+        <option>S</option>
+        <option>M</option>
+        <option>L</option>
+        <option>XL</option>
+        <option>XXL</option>
+      </select>
+    </div>
+    <div style="margin-top:20px;">
+      <button style="background:#000; color:#fff; padding:10px 20px; border:none; cursor:pointer;">Add to Cart</button>
+    </div>
+  </div>
+</div>
+
+<!-- Popout Modal -->
+<div id="orderModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal()">&times;</span>
+    <h2>Order Custom T-Shirt</h2>
+    
+    <label for="color">Color:</label>
+    <select id="color">
+      <option value="black">Black</option>
+      <option value="white">White</option>
+      <option value="blue">Blue</option>
+    </select>
+
+    <label for="quantity">Quantity:</label>
+    <input type="number" id="quantity" min="1" value="1">
+
+    <label for="customText">Customization:</label>
+    <textarea id="customText" placeholder="Enter your design or text here"></textarea>
+
+    <button onclick="submitOrder()">Add to Cart</button>
+  </div>
+</div>
+
+<script>
+  // Show modal when "Order Now" is clicked
+  const orderButtons = document.querySelectorAll('.order-btn');
+  const modal = document.getElementById('orderModal');
+
+  orderButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      modal.style.display = 'block';
+    });
+  });
+
+  // Close modal
+  function closeModal() {
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => modal.style.display = 'none');
+  }
+
+  // Submit order (you can later connect this to a form backend or alert)
+  function submitOrder() {
+    const color = document.getElementById('color').value;
+    const quantity = document.getElementById('quantity').value;
+    const customText = document.getElementById('customText').value;
+
+    alert(`Order Details:\nColor: ${color}\nQuantity: ${quantity}\nCustomization: ${customText}`);
+    closeModal(); // Close modal after submitting
+  }
+
+  // Optional: Close modal when clicking outside of it
+  window.onclick = function(event) {
+  document.querySelectorAll('.modal').forEach(modal => {
+    if (event.target === modal) {
+      modal.style.display = 'none';
+
+    }
+  })
+  };
+</script>
+
+<!-- Custom T-Shirt Modal -->
+<div id="regularShirtModal" class="modal">
+  <div class="modal-content product-popup">
+    <span class="close-btn" onclick="closeModal()">&times;</span>
+
+    <div class="product-grid">
+      <!-- Left: Product Images -->
+      <div class="product-images">
+        <img src="shirt-front.jpg" class="main-img" alt="Shirt Front">
+        <div class="thumbnail-row">
+          <img src="shirt-front.jpg" class="thumb" onclick="changeImage(this)">
+          <img src="shirt-back.jpg" class="thumb" onclick="changeImage(this)">
+          <img src="shirt-closeup.jpg" class="thumb" onclick="changeImage(this)">
+        </div>
+      </div>
+
+      <!-- Right: Product Details -->
+      <div class="product-details">
+        <h2>Regular Shirt - Black</h2>
+        <p class="price"><span class="sale">₱1,071.00</span> <span class="original">₱1,190.00</span></p>
+
+        <label>Color:</label>
+        <div class="color-options">
+          <div class="color-swatch black selected"></div>
+          <div class="color-swatch white"></div>
+          <div class="color-swatch gray"></div>
+        </div>
+
+        <label>Size:</label>
+        <div class="size-options">
+          <button>S</button>
+          <button>M</button>
+          <button>L</button>
+          <button>XL</button>
+          <button>XXL</button>
+        </div>
+
+        <label>Quantity:</label>
+        <div class="quantity-controls">
+          <button onclick="changeQty(-1)">−</button>
+          <input type="number" id="quantity" value="1" min="1">
+          <button onclick="changeQty(1)">+</button>
+        </div>
+
+        <label for="customText">Customization:</label>
+        <textarea id="customText" placeholder="Enter text/design here"></textarea>
+
+        <button class="add-to-cart">Add to Cart</button>
+        <button class="buy-now">Buy It Now</button>
+
+        <ul class="product-specs">
+          <li>100% cotton</li>
+          <li>2-way stretch</li>
+          <li>210 gsm</li>
+          <li>Embroidered</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  modal = document.getElementById('orderModal');
+
+  // Replace with your own event
+  function openModal() {
+    modal.style.display = 'block';
+  }
+
+  function closeModal() {
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => modal.style.display = 'none');
+  }
+
+  function changeQty(change) {
+    const input = document.getElementById('quantity');
+    let current = parseInt(input.value) || 1;
+    input.value = Math.max(1, current + change);
+  }
+
+  function changeImage(img) {
+    const main = document.querySelector('.main-img');
+    main.src = img.src;
+  }
+
+  window.onclick = function(event) {
+  document.querySelectorAll('.modal').forEach(modal => {
+    if (event.target === modal) {
+      modal.style.display = 'none';
+    }
+  }) 
+};
+</script>
+
+
+</body>
+</html>

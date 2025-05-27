@@ -1,0 +1,213 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Product Popup</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; }
+    .modal {
+      display: block;
+      position: fixed;
+      z-index: 1000;
+      padding-top: 40px;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.7);
+    }
+    .modal-content.product-popup {
+      background-color: white;
+      margin: auto;
+      border-radius: 8px;
+      padding: 20px;
+      width: 90%;
+      max-width: 1000px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .close-btn {
+      position: absolute;
+      top: 15px; right: 20px;
+      font-size: 28px;
+      color: #aaa;
+      cursor: pointer;
+    }
+    .product-grid {
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+    .product-images {
+      flex: 1;
+    }
+    .product-images .main-img {
+      width: 100%;
+      border-radius: 8px;
+    }
+    .thumbnail-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .thumb {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border: 2px solid transparent;
+      cursor: pointer;
+    }
+    .thumb:hover {
+      border-color: #444;
+    }
+    .product-details {
+      flex: 1;
+    }
+    .price {
+      font-size: 20px;
+    }
+    .sale {
+      color: red;
+      font-weight: bold;
+    }
+    .original {
+      text-decoration: line-through;
+      color: gray;
+      margin-left: 10px;
+    }
+    .color-options {
+      display: flex;
+      gap: 10px;
+      margin: 5px 0 15px;
+    }
+    .color-swatch {
+      width: 25px; height: 25px;
+      border-radius: 50%;
+      border: 2px solid #ccc;
+      cursor: pointer;
+    }
+    .color-swatch.black { background: black; }
+    .color-swatch.white { background: white; border: 1px solid #aaa; }
+    .color-swatch.gray  { background: gray; }
+    .color-swatch.selected {
+      border: 2px solid #222;
+    }
+    .size-options button {
+      padding: 6px 12px;
+      margin-right: 5px;
+      border: 1px solid #ccc;
+      background: white;
+      cursor: pointer;
+    }
+    .quantity-controls {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 15px;
+    }
+    .quantity-controls button {
+      padding: 5px 10px;
+      font-size: 18px;
+      background: #eee;
+      border: none;
+      cursor: pointer;
+    }
+    .quantity-controls input {
+      width: 40px;
+      text-align: center;
+    }
+    textarea {
+      width: 100%;
+      height: 60px;
+      margin-bottom: 15px;
+    }
+    .add-to-cart, .buy-now {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: none;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+    .add-to-cart {
+      background-color: black;
+      color: white;
+    }
+    .buy-now {
+      background-color: white;
+      border: 1px solid black;
+    }
+    .product-specs {
+      list-style: none;
+      padding-left: 0;
+      font-size: 14px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+
+<div id="orderModal" class="modal">
+  <div class="modal-content product-popup">
+    <span class="close-btn" onclick="closeModal()">&times;</span>
+    <div class="product-grid">
+      <div class="product-images">
+        <img src="https://via.placeholder.com/400x400?text=Shirt+Front" class="main-img" alt="Shirt Front">
+        <div class="thumbnail-row">
+          <img src="https://via.placeholder.com/60x60?text=Front" class="thumb" onclick="changeImage(this)">
+          <img src="https://via.placeholder.com/60x60?text=Back" class="thumb" onclick="changeImage(this)">
+          <img src="https://via.placeholder.com/60x60?text=Closeup" class="thumb" onclick="changeImage(this)">
+        </div>
+      </div>
+      <div class="product-details">
+        <h2>Regular Shirt - Black</h2>
+        <p class="price"><span class="sale">₱1,071.00</span> <span class="original">₱1,190.00</span></p>
+        <label>Color:</label>
+        <div class="color-options">
+          <div class="color-swatch black selected"></div>
+          <div class="color-swatch white"></div>
+          <div class="color-swatch gray"></div>
+        </div>
+        <label>Size:</label>
+        <div class="size-options">
+          <button>S</button><button>M</button><button>L</button><button>XL</button><button>XXL</button>
+        </div>
+        <label>Quantity:</label>
+        <div class="quantity-controls">
+          <button onclick="changeQty(-1)">−</button>
+          <input type="number" id="quantity" value="1" min="1">
+          <button onclick="changeQty(1)">+</button>
+        </div>
+        <label for="customText">Customization:</label>
+        <textarea id="customText" placeholder="Enter text/design here"></textarea>
+        <button class="add-to-cart">Add to Cart</button>
+        <button class="buy-now">Buy It Now</button>
+        <ul class="product-specs">
+          <li>100% cotton</li>
+          <li>2-way stretch</li>
+          <li>210 gsm</li>
+          <li>Embroidered</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function closeModal() {
+    document.getElementById('orderModal').style.display = 'none';
+  }
+  function changeQty(change) {
+    const input = document.getElementById('quantity');
+    let current = parseInt(input.value) || 1;
+    input.value = Math.max(1, current + change);
+  }
+  function changeImage(img) {
+    const main = document.querySelector('.main-img');
+    main.src = img.src;
+  }
+</script>
+
+</body>
+</html>
